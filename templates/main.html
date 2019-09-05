@@ -1,0 +1,326 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基于树莓派的温湿度实时监测网页</title>
+    <link href="{{ url_for('static', filename='style.css') }}" >
+    <script src="{{ url_for('static', filename='echarts.min.js') }}"></script>
+    <style>
+        *{
+    margin: 0;
+    padding: 0;
+}
+header {
+    width: 100%;
+    height: 50px;
+    background-color: #003400;
+    position: relative;
+}
+header p{
+    width: auto;
+    font-family: "微软雅黑 Light";
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 19px;
+    text-align: center;
+    line-height: 50px;
+    position: absolute;
+    left: 600px;
+}
+header img{
+    width: 28px;
+    height: 28px;
+    margin-top: 9px;
+    position: absolute;
+    left: 569px;
+}
+.Middle {
+    width: 100%;
+    height: 700px;
+    background-image: url("{{ url_for('static', filename='img/timg.jpg') }}");
+    background-attachment: fixed;
+    background-size: 100% 100%;
+    position: relative;
+}
+.Middle .Shadow{
+    position: absolute;
+    top: 0;
+    right: 10%;
+    left: 10%;
+    height: 700px;
+    opacity: 0.5;
+    background-color: black;
+}
+.Middle .NowTime {
+    position: absolute;
+    top: 50px;
+    left: 200px;
+    width: 450px;
+}
+.Middle .NowTime #date {
+    position: absolute;
+    top: 1px;
+    left: 62px;
+    width: auto;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    color: white;
+    font-size: 26px;
+    text-align: center;
+    letter-spacing: 4px;
+}
+.Middle .Temperature {
+    position: absolute;
+    top: 145px;
+    left: 197px;
+    width: 300px;
+}
+.Middle .Temperature #Temperature{
+    position: absolute;
+    top: 7px;
+    left: 65px;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    color: white;
+    font-size: 26px;
+    text-align: center;
+    letter-spacing: 4px;
+}
+.Middle .Temperature p{
+    position: absolute;
+    top: 53px;
+    left: 9px;
+    font-family: "微软雅黑 Light";
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+.Middle .Humidity {
+    position: absolute;
+    top: 250px;
+    left: 197px;
+    width: 300px;
+}
+.Middle .Humidity #Humidity{
+    position: absolute;
+    top: 7px;
+    left: 65px;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    color: white;
+    font-size: 26px;
+    text-align: center;
+    letter-spacing: 4px;
+}
+.Middle .Humidity P{
+    position: absolute;
+    top: 47px;
+    left: 7px;
+    font-family: "微软雅黑 Light";
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+.Middle .Water{
+    position: absolute;
+    top: 350px;
+    left: 196px;
+    width: 300px;
+}
+.Middle #Water{
+    display: block;
+    position: absolute;
+    top: 8px;
+    left: 160px;
+    width: 60px;
+    height: 28px;
+    border-radius: 15px / 15px 15px 15px 15px;
+    background-color: #009688;
+    font-family: "微软雅黑 Light";
+    text-align: center;
+    text-decoration: none;
+    line-height: 28px;
+    color: white;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+.Middle #Time, #Times{
+    background-color: rgba(255,255,255,0.5);
+    width: 75px;
+    font-family: "Microsoft YaHei";
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    position: absolute;
+    top: 10px;
+    left: 64px;
+}
+#Times{
+    top: 50px;
+}
+#waterTime{
+    position: absolute;
+    top: -7px;
+    left: 65px;
+    color: #ffffff;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    font-size: 11px;
+}
+#waterTimes{
+    position: absolute;
+    top: 35px;
+    left: 65px;
+    color: #ffffff;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    font-size: 11px;
+}
+.Middle #Chart {
+    position: absolute;
+    left: 500px;
+    top: 160px;
+    width: 600px;
+    height: 400px;
+}
+.Middle .B{
+    display: block;
+    position: absolute;
+    width: 80px;
+    height: 25px;
+    background-color: darkgray;
+    font-family: "微软雅黑 Light";
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+.Middle #button2{
+    top: 26px;
+}
+.Footer {
+    width: 100%;
+    height: 30px;
+    background-color: #003400;
+    position: relative;
+}
+    </style>
+</head>
+<header>
+    <p>温室大棚实时监测控制网页</p>
+    <img src="{{ url_for('static', filename='img/dapeng.png') }}">
+</header>
+<div class="Middle">
+    <div class="Shadow"></div>
+    <div class="NowTime">
+        <img src="{{ url_for('static', filename='img/shijian.png') }}" width="40">
+        <div id="date"></div>
+    </div>
+    <div class="Temperature">
+        <img src="{{ url_for('static', filename='img/wendu.png') }}">
+        <div id="Temperature">{{ temperature }}&nbsp;℃</div>
+        <p>温度</p>
+    </div>
+    <div class="Humidity">
+        <img src="{{ url_for('static', filename='img/shidu.png') }}" width="42">
+        <div id="Humidity">{{ humidity }}&nbsp;%</div>
+        <p>湿度</p>
+    </div>
+    <div class="Water">
+        <img src="{{ url_for('static', filename='img/jiaoshui2.png') }}">
+        <form method="post" id="form" action="/water">
+            <span id="waterTime">浇水时间</span><input type="number" id="Time" name="stime" value="0">
+            <span id="waterTimes">浇水次数</span><input type="number" id="Times" name="times" value="0">
+            <input type="submit" id="Water" value="浇水">
+        </form>
+    </div>
+    <div class="button"><button id="button" class="B">停止监控</button></div>
+    <div class="button"><button id="button2" CLASS="B">开始监控</button></div>
+    <div id="Chart" ></div>
+</div>
+<a href="/update" id="update" hidden>wwww</a>
+<div id="Tarr" hidden>{{ Tarr }}</div>
+<div id="Harr" hidden>{{ Harr }}</div>
+<div class="Footer">{{ settime }}</div>
+</body>
+<script>
+    var d=new Date();
+    document.getElementById('date').innerHTML=d.toLocaleString();
+    var tarr = document.getElementById('Tarr').innerText.slice(1,-1).split(', ');
+    var harr = document.getElementById('Harr').innerText.slice(1,-1).split(', ');    
+    console.log(typeof tarr)
+    console.log(tarr)
+    console.log(typeof harr)
+    console.log(harr)
+    
+    var Dchart = echarts.init(document.getElementById('Chart'));
+    var option = {
+        backgroundColor: 'rgba(255,255,255,0.6)',
+        borderWidth: 10,
+        borderColor: "#000",
+        borderRadius: 5,
+        title : {
+            text: '温室大棚温湿度实时折线图',
+        },
+        tooltip : {
+            trigger: 'axis'
+        },
+        legend: {
+            data:['温度','湿度']
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                restore : {show: true},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'category',
+                boundaryGap : false,
+                data : [0,5,10,15,20,25,30,35,40,45]
+            }
+        ],
+        yAxis : [
+            {
+                type : 'value',
+                data:[0,20,40,60,80,100]
+            }
+        ],
+        series : [
+            {
+                name:'温度',
+                type:'line',
+                smooth:true,
+                itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                data:tarr
+            },
+            {
+                name:'湿度',
+                type:'line',
+                smooth:true,
+                itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                data:harr
+            },
+        ]
+    };
+    Dchart.setOption(option);
+
+    var SET = null;
+    var SET=setInterval(function () {
+            document.getElementById('button2').onclick = function () {};
+            document.getElementById('update').click();
+        },3000);
+    document.getElementById('button2').onclick = function () {
+                location.replace('http://localhost:8080')
+    };
+    document.getElementById('button').onclick= function () {
+        clearInterval(SET);
+    };
+
+
+
+</script>
+</html>
